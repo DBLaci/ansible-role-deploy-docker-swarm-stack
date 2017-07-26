@@ -1,0 +1,6 @@
+---
+
+- name: "Delete tmp directory"
+  file:
+    path: "{{ deploy_stack_tmp_path }}"
+    state: absent

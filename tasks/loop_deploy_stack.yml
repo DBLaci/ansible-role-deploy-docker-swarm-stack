@@ -1,0 +1,45 @@
+---
+
+# shortcut variable
+- set_fact:
+    stack_name: "{{ stack.name }}{{ deploy_stack_postfix }}"
+
+- debug: msg="Deploy {{ stack_name }} ..."
+
+- set_fact:
+    docker_compose_file: "{% if stack.docker_compose_file is defined %}{{ stack.docker_compose_file }}{% else %}{{ stack.name }}.yml{% endif %}"
+
+- local_action: stat path="{{ deploy_stack_compose_file_path }}/{{ docker_compose_file }}.j2"
+  become: no # no need to sudo on local machine for this
+  register: docker_compose_j2
+
+- include: cleanup_tmp.yml
+
+- name: "Create tmp directory"
+  file:
+    path: "{{ deploy_stack_tmp_path }}"
+    state: directory
+    mode: 0700
+
+- name: "Build compose from template"
+  template:
+    src: "{{ deploy_stack_compose_file_path }}/{{ docker_compose_file }}.j2"
+    dest: "{{ deploy_stack_tmp_path }}/docker-compose.tmp.yml"
+  when: docker_compose_j2.stat.exists
+
+- name: "Copy compose as is"
+  copy:
+    src: "{{ deploy_stack_compose_file_path }}/{{ docker_compose_file }}"
+    dest: "{{ deploy_stack_tmp_path }}/docker-compose.tmp.yml"
+  when: not docker_compose_j2.stat.exists
+
+- name: "Set up .env" # empty dir guarantee no unneeded .env here
+  copy:
+    content: "{% for key, value in stack.env.iteritems() %}{{ key }}={{ value }}\n{% endfor %}"
+    dest: "{{ deploy_stack_tmp_path }}/docker-compose.env"
+  when: stack.env is defined
+
+- name: "Stack deploy"
+  shell: "env $(cat {{ deploy_stack_tmp_path }}/docker-compose.env | grep ^[A-Z] | xargs) docker stack deploy --prune --compose-file {{ deploy_stack_tmp_path }}/docker-compose.tmp.yml {{ stack_name }}  --with-registry-auth"
+
+- include: cleanup_tmp.yml

@@ -36,6 +36,12 @@ After setting the variables (see defaults/main.yml) you can use something like:
       roles:
          - { role: ansible-role-deploy-docker-swarm-stack, deploy_stack_postfix: "-prod" }
 
+You can deploy one stack with role parameters:
+
+    - hosts: swarm-manager-nodes[0]
+      roles:
+         - { role: ansible-role-deploy-docker-swarm-stack, stack: {name: xyz123} }
+
 License
 -------
 

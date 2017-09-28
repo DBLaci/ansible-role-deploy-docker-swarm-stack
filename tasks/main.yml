@@ -1,10 +1,14 @@
 ---
 
 # deploy stacks
-
 - name: Deploy each service
   include: loop_deploy_stack.yml
   with_items: "{{ deploy_stack_stacks }}"
   loop_control:
     loop_var: stack
-  when: deploy_stack_name is not defined or stack.name == deploy_stack_name
+  when: stack is not defined and ( deploy_stack_name is not defined or stack.name == deploy_stack_name )
+
+# deploy one stack
+- name: Deploy each service
+  include: loop_deploy_stack.yml
+  when: stack is defined

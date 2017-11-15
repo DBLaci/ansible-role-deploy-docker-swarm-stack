@@ -1,12 +1,13 @@
 ---
 
 # 0 or more stacks to deploy
-deploy_stack_stacks:
-  - name: stack-name
-    docker_compose_file: "compose-file-if-not-the-same-as-stack-name.yml" # optional
-    env: # optional
-      IMAGE_TAG: "1.2.3"
-      MYSQL_ROOT_PASSWORD: "secure" # please use vault variable for this :)
+#example
+#deploy_stack_stacks:
+#  - name: stack-name
+#    docker_compose_file: "compose-file-if-not-the-same-as-stack-name.yml" # optional
+#    env: # optional
+#      IMAGE_TAG: "1.2.3"
+#      MYSQL_ROOT_PASSWORD: "secure" # please use vault variable for this :)
 
 # the path to the docker-compose.yml and docker-compose.yml.j2 files
 deploy_stack_compose_file_path: "files/docker-compose"

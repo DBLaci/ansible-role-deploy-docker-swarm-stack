@@ -40,6 +40,6 @@
   when: stack1.env is defined
 
 - name: "Stack deploy"
-  shell: "env $(cat {{ deploy_stack_tmp_path }}/docker-compose.env | grep ^[A-Z] | xargs) docker stack deploy --prune --compose-file {{ deploy_stack_tmp_path }}/docker-compose.tmp.yml {{ stack_name }}  --with-registry-auth"
+  shell: "env $(cat {{ deploy_stack_tmp_path }}/docker-compose.env | grep ^[A-Z] | xargs -0) docker stack deploy --prune --compose-file {{ deploy_stack_tmp_path }}/docker-compose.tmp.yml {{ stack_name }}  --with-registry-auth"
 
 - import_tasks: cleanup_tmp.yml
